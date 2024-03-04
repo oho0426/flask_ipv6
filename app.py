@@ -72,6 +72,7 @@ def Ipv6Info():  # put application's code here
             rt_data = {}
             rt_data['code'] = 0
             rt_data['data'] = ipv6_list
+            database.close_connection()
             return rt_data
         else:
             raise ValueError("请求类型错误！")
