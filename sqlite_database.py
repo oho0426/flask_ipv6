@@ -42,11 +42,15 @@ class SQLiteDatabase:
             print("Error retrieving all data from the table:", str(e))
             return []
 
-    def get_where_data(self, where_str):
+    def get_where_data(self, column='*', where_str=""):
         try:
             cursor = self.db.cursor()
-            query = "SELECT * FROM ipv6_info WHERE ?"
-            cursor.execute(query, where_str)
+            query = f"SELECT {column} FROM ipv6_info"
+            where = where_str
+            if len(str(where)) > 0:
+                query = f"SELECT {column} FROM ipv6_info {where_str}"
+
+            cursor.execute(query)
             result = cursor.fetchall()
             return result
 
@@ -63,10 +67,10 @@ class SQLiteDatabase:
 if __name__ == '__main__':
     # 测试代码
     database = SQLiteDatabase('example.db')
-    user1 = {'uid': 1, 'ipv6': "2409:8a56:3227:514:a4f0:cb52:1a78:1ee0", 'domain': "111.com"}
-    user2 = {'uid': 2, 'ipv6': '2429:8a56:3227:514:a4f0:cb52:1a78:1ee0', 'domain': "1"}
-    database.insert_data(user1)
-    database.insert_data(user2)
-    result = database.get_all_data()
+    # user1 = {'uid': 1, 'ipv6': "2409:8a56:3227:514:a4f0:cb52:1a78:1ee0", 'domain': "111.com"}
+    # user2 = {'uid': 2, 'ipv6': '2429:8a56:3227:514:a4f0:cb52:1a78:1ee0', 'domain': "1"}
+    # database.insert_data(user1)
+    # database.insert_data(user2)
+    result = database.get_where_data(column='uid, ipv6address, domain, max(create_time) as create_time', where_str='group by uid')
     print(result)
     database.close_connection()
