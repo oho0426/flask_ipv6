@@ -1,7 +1,6 @@
 from flask import Flask
 from flask import request
 import json
-from custom_error import CustomError
 app = Flask(__name__)
 
 
@@ -18,17 +17,19 @@ def Ipv6Info():  # put application's code here
                 return '{"code": -1, "messages": "uid和ipv6地址不能为空！"}'
             print(data_json['uid'])
             # print(data)
-            raise CustomError("11212")
 
         else:
-            return '{"code": -1, "messages": "请求类型错误！"}'
-    except CustomError as e:
-        print(e)
-
-    except Exception as e:
+            raise ValueError("请求类型错误！")
+    except ValueError as e:
         error_json = json.loads('{"code": -1, "messages": ""}')
-        error_json['messages'] = e
-        return
+        error_json['messages'] = str(e)
+        return error_json
+
+    except Exception:
+        error_json = json.loads('{"code": -1, "messages": ""}')
+        error_json['messages'] = "未知错误！"
+
+        return error_json
     # 记录好时间，精确到秒，
     # 支持客户端提交一个域名，需校验必须唯一，如果不提交域名，服务器自动生成域名
     # 每次客户端请求，都把所有最新的IP拼域名，根据主机进行分组过滤，返回给客户端，客户端写入hosts文件
