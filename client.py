@@ -2,6 +2,7 @@ import re
 import requests
 import os
 import json
+from edit_hosts import edit_host_from_syshosts
 
 # 获取本机的外网IPv6
 # ipw_url = 'https://test.ipw.cn/api/ip/myip?json'
@@ -38,9 +39,7 @@ if res_data['code'] == 0:
         ip_domain = ipv6_info + " " + domain_info
         ip_list.append(ip_domain)
 
-
-    print(ip_info)
-    print(ip_list)
+    edit_host_from_syshosts(ip_list)
 else:
     print("出现错误！")
 

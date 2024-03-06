@@ -34,14 +34,18 @@ def read_syshosts():
 
 
 # 将系统hosts中已存在网站域名的删除
-def del_host_from_syshosts():
+def edit_host_from_syshosts(ip_list):
+    # 先备份hosts文件,如果之前已经备份过,就不再备份
+    print("备份hosts文件为： " + hosts_bak)
+    if not os.path.exists(hosts_bak):
+        shutil.copy(hosts, hosts_bak)
     syshosts = read_syshosts()
     syshosts_new = [i for i in syshosts if i != '']
     # old_webmanager = list(filter(lambda text: all([word in text for word in webmanager]), syshosts_new))
     # old_www = list(filter(lambda text: all([word in text for word in www]), syshosts_new))
     # inval = [text for word in web for text in syshosts_new if word in text]
-    print("start check hosts ......")
-    ip_list = ['121209 eii.com', '28182:2883 sudisai.com']
+    print("start edit hosts ......")
+    # ip_list = ['121209 eii.com', '28182:2883 sudisai.com']
     dict_ip = {}
     for ip in ip_list:
         ip_domain = ip.split(" ")
@@ -52,7 +56,6 @@ def del_host_from_syshosts():
         for line in syshosts_new:
             # 逐行检查hosts文件，如果存在需要插入的域名，则替换此行，如果域名不存在，则加在最后一行
             # 这个列表记录已经存在的域名
-
             for key in dict_ip:
                 serch_domain = re.findall(key, line)
                 # 如果正则有查到,说明存在,即替换,否则插入到最后
@@ -101,7 +104,8 @@ if __name__ == '__main__':
     if not os.path.exists(hosts_bak):
         shutil.copy(hosts, hosts_bak)
     # 先删除多余的hosts
-    del_host_from_syshosts()
+    ip_list = ['121209 eii.com', '28182:2883 sudisai.com']
+    edit_host_from_syshosts(ip_list)
     # 再添加需要的hosts
     # add_host_from_hostconfig()
     # subprocess.call('pause', shell=True)
