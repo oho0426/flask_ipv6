@@ -1,5 +1,7 @@
 #!/usr/bin/python
 # -*- coding: UTF-8 -*-
+import os
+import re
 import shutil
 import subprocess
 
@@ -32,7 +34,7 @@ def read_syshosts():
 
 
 # 将系统hosts中已存在网站域名的删除
-def del_host_from_syshosts(ip_list):
+def del_host_from_syshosts():
     syshosts = read_syshosts()
     syshosts_new = [i for i in syshosts if i != '']
     # old_webmanager = list(filter(lambda text: all([word in text for word in webmanager]), syshosts_new))
@@ -40,14 +42,42 @@ def del_host_from_syshosts(ip_list):
     # inval = [text for word in web for text in syshosts_new if word in text]
     print("start check hosts ......")
     ip_list = ['121209 eii.com', '28182:2883 sudisai.com']
-    with open(hosts, 'w') as f_n:
+    dict_ip = {}
+    for ip in ip_list:
+        ip_domain = ip.split(" ")
+        dict_ip[ip_domain[1]] = ip_domain[0]
+
+    save_key = []
+    with open(hosts, 'w', encoding='utf-8') as f_n:
         for line in syshosts_new:
-            if line not in inval:
-                f_n.write(line)
-                f_n.write("\n")
-            else:
-                print(line + '  removed')
-                continue
+            # 逐行检查hosts文件，如果存在需要插入的域名，则替换此行，如果域名不存在，则加在最后一行
+            # 这个列表记录已经存在的域名
+
+            for key in dict_ip:
+                serch_domain = re.findall(key, line)
+                # 如果正则有查到,说明存在,即替换,否则插入到最后
+                if len(serch_domain) != 0:
+                    line = dict_ip[key] + " " + key
+                    save_key.append(key)
+                    print(line)
+            f_n.write(line)
+            f_n.write("\n")
+
+    # 不存在hosts文件的域名,追加添加在文件最后
+    with open(hosts, 'a', encoding='utf-8') as fb:
+        for item in dict_ip:
+            if item not in save_key:
+                ip_domain_str = dict_ip[item] + " " + item
+                fb.write(ip_domain_str)
+                fb.write("\n")
+
+
+    # if line not in inval:
+            #     f_n.write(line)
+            #     f_n.write("\n")
+            # else:
+            #     print(line + '  removed')
+            #     continue
 
 
 def add_host_from_hostconfig():
@@ -68,9 +98,10 @@ def add_host_from_hostconfig():
 if __name__ == '__main__':
     # 备份
     print("备份hosts文件为： " + hosts_bak)
-    shutil.copy(hosts, hosts_bak)
+    if not os.path.exists(hosts_bak):
+        shutil.copy(hosts, hosts_bak)
     # 先删除多余的hosts
     del_host_from_syshosts()
     # 再添加需要的hosts
-    add_host_from_hostconfig()
-    subprocess.call('pause', shell=True)
+    # add_host_from_hostconfig()
+    # subprocess.call('pause', shell=True)
