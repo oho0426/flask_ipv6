@@ -21,7 +21,7 @@ print(f"IPv6地址： {ipv6_info}")
 uid = '2'
 domain = 'note.ipv6.com'
 IPv6Address = ipv6_info
-url = 'http://101.33.255.71:5000/'
+url = 'http://127.0.0.1:5000/'
 data = {'uid': uid, 'IPv6Address': IPv6Address, 'domain': domain}
 data = json.dumps(data)
 
